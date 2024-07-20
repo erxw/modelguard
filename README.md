@@ -1,6 +1,6 @@
 # ModelGuard
 
-ModelGuard is a powerful library for validating model inputs and formatting outputs. It provides a set of tools and utilities to ensure that the inputs provided to your machine learning models are valid and conform to the expected format. Additionally, it helps you format the outputs of your models in a consistent and standardized way as text instead of numbers.
+ModelGuard is a simple library for validating model inputs and formatting outputs. It provides a set of tools and utilities to ensure that the inputs provided to your machine learning models are valid and conform to the expected format. Additionally, it helps you format the outputs of your models in a consistent and standardized way as text instead of numbers.
 
 ## Features
 
