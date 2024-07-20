@@ -9,6 +9,13 @@ def model_guard():
                                      {"text": "My favorite pet is {text}", "mapping": {0: "Dog", 1: "Cat"}}],
                       impute_value=0)
 
+@pytest.fixture
+def model_guard_no_mapping():
+    return ModelGuard(input_features=["feature1", "feature2", "feature3"],
+                      output_labels=[{"text": "The mystery number is {text}"},
+                                     {"text": "My favorite digit is {text}"}],
+                      impute_value=0)
+
 
 def test_transform_input(model_guard):
     # Test case 1: Test with a single dictionary input
@@ -73,7 +80,21 @@ def test_transform_output(model_guard):
     assert transformed_data[1][0] == "The mystery animal is Starfish"
     assert transformed_data[1][1] == "My favorite pet is Cat"
 
+
     # Test case 3: Test with invalid output data type
     output_data = [0, 1]
     with pytest.raises(TypeError):
         transformed_data = model_guard.transform_output(output_data)
+
+
+
+def test_transform_output_no_mapping(model_guard_no_mapping):
+    # Test case 1: Test with invalid output data type
+    output_data = [[0.9, 1]]
+    transformed_data = model_guard_no_mapping.transform_output(output_data)
+    assert isinstance(transformed_data, list)
+    assert len(transformed_data) == 1
+    assert isinstance(transformed_data[0], list)
+    assert len(transformed_data[0]) == 2
+    assert transformed_data[0][0] == "The mystery number is 0.9"
+    assert transformed_data[0][1] == "My favorite digit is 1"

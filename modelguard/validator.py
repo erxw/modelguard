@@ -8,7 +8,7 @@ import pandas as pd
 
 class TextWrapper(BaseModel):
     text: str = Field(description = "Text description of the model output")
-    mapping: Dict[int, str] = Field(description = "Mapping of prediction values to output labels")
+    mapping: Optional[Union[Dict[int, str], None]] = Field(default = None, description = "Mapping of prediction values to output labels")
 
 class ModelGuard(BaseModel):
     input_features: Union[List[Any], None] = Field(default = None, description = "List of input features")
@@ -81,6 +81,11 @@ class ModelGuard(BaseModel):
             for sample in data:
                 temp = []
                 for i, label in enumerate(self.output_labels):
-                    temp.append(label.text.format(text = label.mapping[sample[i]]))
+                    if label.mapping: 
+                        value = label.mapping[sample[i]]
+                    else:
+                        value = sample[i]
+                    text = label.text.format(text = value)
+                    temp.append(text)
                 results.append(temp)
             return results
