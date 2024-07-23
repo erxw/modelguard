@@ -18,60 +18,41 @@ pip install modelguard
 ### Input Transform
  Create a ModelGuard instance for input validation to ensure that features (feature1, feature2, feature3) appear in the inference dataset. If not, impute missing columns and remove unnecessary columns. 
 
-from modelguard import ModelGuard
+from modelguard import InputGuard
 
-guard = ModelGuard(input_features=["feature1", "feature2", "feature3"], impute_value = 0)
+guard = InputGuard.from_dataframe(df)
 
-validated_xtrain = guard.transform_input(xtrain)
+guard = InputGuard.from_dict({'name': str, 'age': int})
+
+validated_xtrain = guard.transform(xtrain)
 
 ### Output Transform
 
  Creates a wrapper around model predictions to map the individual model predictions (numerical) into a string
 
-from modelguard import ModelGuard
+from modelguard import OutputGuard
 
-output_labels=[{"text": "The mystery animal is {text}", "mapping": {0: "Octopus", 1: "Starfish"}},
-                {"text": "My favorite pet is {text}", "mapping": {0: "Dog", 1: "Cat"}}]
+output_labels=[{"text": "The mystery animal is {value}", "mapping": {0: "Octopus", 1: "Starfish"}},
+                {"text": "My favorite pet is {value}", "mapping": {0: "Dog", 1: "Cat"}}]
 
 
-guard = ModelGuard(output_labels = output_labels)
+guard = OutputGuard(labels = output_labels)
 
 predictions = ... # any way of generating a matrix of predictions
 
-predicted_texts = guard.transform_output(predictions) 
+predicted_texts = guard.transform(predictions) 
 
 joined_texts = ['.'.join(p) for p in predicted_texts] 
 
-
-### Both Input and Output Transform
-from modelguard import ModelGuard
-
-output_labels=[{"text": "The mystery animal is {text} on Mondays", "mapping": {0: "Octopus", 1: "Starfish"}},
-                {"text": "My favorite pet is {text}", "mapping": {0: "Dog", 1: "Cat"}}]
-
-guard = ModelGuard(input_features=["feature1", "feature2", "feature3"], impute_value = 0, output_labels = output_labels)
-
-validated_xtrain = guard.transform_input(xtrain)
-
-predictions = ... # any way of generating a matrix of predictions
-
-predicted_texts = guard.transform_output(predictions) # 
-
-predicted_texts is a list of a list of strings
-
-
 ### No Output Mapping of values (Regression-type tasks)
-from modelguard import ModelGuard
+from modelguard import OutputGuard
 
-guard = ModelGuard(output_labels=[{"text": "The mystery number is {text} on Monday"},
-                                  {"text": "My favorite digit is {text}"}])
+guard = OutputGuard(labels=[{"text": "The mystery number is {value} on Monday"},
+                                  {"text": "My favorite digit is {value}"}])
 
 predictions = ... # any way of generating a matrix of predictions
 
-predicted_texts = guard.transform_output(predictions) # 
-
-predicted_texts is a list of a list of strings
-
+predicted_texts = guard.transform(predictions) 
 
 ### Example use with sklearn
 
@@ -81,5 +62,5 @@ label_encoder = LabelEncoder()
 encoded_labels = label_encoder.fit_transform(labels)
 label_mapping = dict(zip(label_encoder.transform(label_encoder.classes_), label_encoder.classes_))
 
-output_labels = [{"text": 'The patient is {text}', "mapping" = label_mapping}]
-guard = ModelGuard(output_labels = output_labels)
+output_labels = [{"text": 'The patient is {value}', "mapping" = label_mapping}]
+guard = OutputGuard(labels = output_labels)
